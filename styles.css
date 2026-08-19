@@ -526,27 +526,7 @@ footer{ background:var(--cream-warm); padding:56px 0 30px; }
 .hero-photo-frame .reveal-mask,
 .hero-visual .reveal-mask{ transition-duration:.85s, .95s, .65s, .35s; }
 
-/* ---------- Custom cursor (solo desktop, pointer fino) ---------- */
-html.has-custom-cursor, html.has-custom-cursor *{ cursor:none !important; }
-.custom-cursor{
-  position:fixed; top:0; left:0; z-index:9999; pointer-events:none;
-  opacity:0; transition:opacity .3s var(--ease);
-  will-change:transform;
-}
-.custom-cursor.cc-visible{ opacity:1; }
-.cc-dot{
-  position:absolute; top:-3px; left:-3px; width:6px; height:6px; border-radius:50%;
-  background:var(--coral); transition:transform .25s var(--ease), background .25s var(--ease);
-}
-.cc-ring{
-  position:absolute; top:-18px; left:-18px; width:36px; height:36px; border-radius:50%;
-  border:1px solid rgba(255,87,87,.5);
-  transition:transform .35s var(--spring), border-color .3s var(--ease), background .3s var(--ease);
-}
-.custom-cursor.cc-hover .cc-ring{ transform:scale(1.7); background:rgba(255,87,87,.08); border-color:var(--coral); }
-.custom-cursor.cc-hover .cc-dot{ transform:scale(0); }
-.custom-cursor.cc-active .cc-ring{ transform:scale(.85); }
-@media(max-width:860px){ .custom-cursor{ display:none; } html.has-custom-cursor, html.has-custom-cursor *{ cursor:auto !important; } }
+/* ---------- Cursor: se usa el cursor normal del sistema (sin cursor personalizado) ---------- */
 
 /* ---------- Spotlight en secciones oscuras ---------- */
 .quote-section, .contact-band{ position:relative; overflow:hidden; }
@@ -562,7 +542,5 @@ html.has-custom-cursor, html.has-custom-cursor *{ cursor:none !important; }
 @media (prefers-reduced-motion: reduce){
   .word-inner{ transition:opacity .3s linear !important; transform:none !important; }
   .reveal-mask{ transition:opacity .3s linear !important; transform:none !important; filter:none !important; clip-path:none !important; }
-  .custom-cursor{ display:none !important; }
-  html.has-custom-cursor, html.has-custom-cursor *{ cursor:auto !important; }
   ::view-transition-old(root), ::view-transition-new(root){ animation:none !important; }
 }

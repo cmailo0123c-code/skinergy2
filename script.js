@@ -55,7 +55,6 @@ function splitTextMotion(el){
     wrapWordsIn(inner);
     mask.appendChild(inner);
     el.appendChild(mask);
-    if(li < lines.length - 1) el.appendChild(document.createElement('br'));
   });
 }
 
@@ -142,46 +141,9 @@ function initHeroParallax(){
   update();
 }
 
-/* ---------- 4. CUSTOM CURSOR (solo desktop con mouse fino) ---------- */
+/* ---------- 4. CUSTOM CURSOR — desactivado a pedido: se usa el cursor normal ---------- */
 function initCustomCursor(){
-  if(!prefersFullMotion) return;
-  document.documentElement.classList.add('has-custom-cursor');
-
-  const cursor = document.createElement('div');
-  cursor.className = 'custom-cursor';
-  cursor.innerHTML = '<span class="cc-ring"></span><span class="cc-dot"></span>';
-  document.body.appendChild(cursor);
-
-  let mx = window.innerWidth / 2, my = window.innerHeight / 2;
-  let rx = mx, ry = my;
-  let visible = false;
-
-  document.addEventListener('mousemove', (e) => {
-    mx = e.clientX; my = e.clientY;
-    if(!visible){ cursor.classList.add('cc-visible'); visible = true; }
-  }, { passive: true });
-  document.addEventListener('mouseleave', () => { cursor.classList.remove('cc-visible'); visible = false; });
-
-  function loop(){
-    rx += (mx - rx) * 0.2;
-    ry += (my - ry) * 0.2;
-    cursor.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
-    requestAnimationFrame(loop);
-  }
-  loop();
-
-  const interactiveSelector = 'a, button, .treat-card, .body-row, .cat, .testi, input, textarea';
-  document.addEventListener('mouseover', (e) => {
-    if(e.target.closest(interactiveSelector)) cursor.classList.add('cc-hover');
-  });
-  document.addEventListener('mouseout', (e) => {
-    const related = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest(interactiveSelector) : null;
-    if(e.target.closest(interactiveSelector) && !related){
-      cursor.classList.remove('cc-hover');
-    }
-  });
-  document.addEventListener('mousedown', () => cursor.classList.add('cc-active'));
-  document.addEventListener('mouseup', () => cursor.classList.remove('cc-active'));
+  return;
 }
 
 /* ---------- 5. MAGNETIC BUTTONS ---------- */
