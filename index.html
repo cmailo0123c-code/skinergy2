@@ -71,31 +71,9 @@
   .testi .who{ display:flex; align-items:center; gap:10px; font-size:13px; font-weight:700; color:var(--ink-soft); }
   .testi .who::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--coral); }
 
-  /* ---------- Glassmorphism (page-local cards) ---------- */
-  .hero-badge{ background:rgba(255,255,255,.6); backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%); border:1px solid rgba(255,255,255,.8); box-shadow:0 24px 40px -18px rgba(31,27,24,.25); }
-  .hero-badge p{ color:var(--ink-soft); }
-
-  .cat, .testi{
-    background:rgba(255,255,255,.6);
-    backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%);
-    border:1px solid rgba(255,255,255,.8);
-    will-change:transform;
-  }
-  .cat:hover, .testi:hover{
-    background:rgba(255,255,255,.8);
-    transform:translate3d(0,-8px,0) scale(1.01);
-    box-shadow:0 22px 40px -20px rgba(31,27,24,.28), 0 0 0 1px rgba(255,180,168,.4);
-    border-color:var(--coral-soft);
-  }
 </style>
 </head>
 <body>
-
-<div class="aurora" aria-hidden="true">
-  <span class="aurora-blob b1"></span>
-  <span class="aurora-blob b2"></span>
-  <span class="aurora-blob b3"></span>
-</div>
 
 <header id="siteHeader">
   <div class="wrap nav-row">
