@@ -1,3 +1,258 @@
+/* ============================================================
+   SKINERGY — PREMIUM MOTION SYSTEM
+   Vanilla JS, sin dependencias. Todo respeta prefers-reduced-motion.
+   ============================================================ */
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+const prefersFullMotion = !reduceMotion && hasFinePointer;
+
+/* ---------- 1. TEXT MOTION — reveal por línea + palabra ----------
+   Envuelve cada <br>-línea de un heading en una "máscara" (overflow:hidden)
+   y cada palabra dentro en su propio span, para poder animarlas con
+   stagger (línea → palabra) sin romper <em>/<b> anidados. */
+function wrapWordsIn(root){
+  function walk(node){
+    if(node.nodeType === 3){
+      const frag = document.createDocumentFragment();
+      node.textContent.split(/(\s+)/).forEach(part => {
+        if(part.trim() === ''){
+          frag.appendChild(document.createTextNode(part));
+        } else {
+          const w = document.createElement('span');
+          w.className = 'word';
+          const wi = document.createElement('span');
+          wi.className = 'word-inner';
+          wi.textContent = part;
+          w.appendChild(wi);
+          frag.appendChild(w);
+        }
+      });
+      node.replaceWith(frag);
+    } else if(node.nodeType === 1){
+      Array.from(node.childNodes).forEach(walk);
+    }
+  }
+  Array.from(root.childNodes).forEach(walk);
+  let i = 0;
+  root.querySelectorAll('.word-inner').forEach(w => { w.style.setProperty('--i', i++); });
+}
+
+function splitTextMotion(el){
+  if(!el || el.dataset.split) return;
+  el.dataset.split = '1';
+  el.classList.remove('reveal', 'load-reveal', 'in');
+  const html = el.innerHTML;
+  const lines = html.split(/<br\s*\/?>/i);
+  el.innerHTML = '';
+  lines.forEach((chunk, li) => {
+    const mask = document.createElement('span');
+    mask.className = 'line-mask';
+    const inner = document.createElement('span');
+    inner.className = 'line-inner';
+    inner.style.setProperty('--li', li);
+    inner.innerHTML = chunk;
+    wrapWordsIn(inner);
+    mask.appendChild(inner);
+    el.appendChild(mask);
+    if(li < lines.length - 1) el.appendChild(document.createElement('br'));
+  });
+}
+
+function initTextMotion(){
+  const heroHeadings = document.querySelectorAll('.hero h1, .page-hero h1');
+  const sectionHeadings = document.querySelectorAll('.section-head h2, .quote-wrap blockquote');
+
+  heroHeadings.forEach(splitTextMotion);
+  sectionHeadings.forEach(splitTextMotion);
+
+  // Hero: revela apenas carga la página (parte del "cinematic intro")
+  heroHeadings.forEach(h => {
+    requestAnimationFrame(() => setTimeout(() => h.classList.add('split-in'), 260));
+  });
+
+  // Headings de sección: revelan al entrar en viewport
+  const headingIO = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(!e.isIntersecting) return;
+      e.target.classList.add('split-in');
+      headingIO.unobserve(e.target);
+    });
+  }, { threshold: 0.35 });
+  sectionHeadings.forEach(h => headingIO.observe(h));
+}
+
+/* ---------- 2. IMAGE MOTION — clip-path + scale + blur→sharp ----------
+   Cada foto se envuelve en una "máscara" invisible que lleva la animación
+   de entrada (clip-path + scale + blur→nítido). El <img> en sí no se toca,
+   así que sus propios efectos de hover (blanco/negro → color) siguen
+   funcionando exactamente igual que antes, sin conflictos de especificidad. */
+function initImageMotion(){
+  // .line-card usa position:absolute + inset:0 para la imagen de fondo del
+  // grid del home — se excluye del wrapper para no alterar ese layout.
+  const imgs = document.querySelectorAll('img[loading="lazy"]');
+  const wraps = [];
+  imgs.forEach(img => {
+    if(img.closest('.line-card')) return;
+    if(img.parentElement && img.parentElement.classList.contains('reveal-mask')) return;
+    const wrap = document.createElement('span');
+    wrap.className = 'reveal-mask';
+    img.parentNode.insertBefore(wrap, img);
+    wrap.appendChild(img);
+    wraps.push(wrap);
+  });
+
+  const imgIO = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(!e.isIntersecting) return;
+      const wrap = e.target;
+      const img = wrap.querySelector('img');
+      const reveal = () => wrap.classList.add('mask-in');
+      if(img.complete && img.naturalWidth > 0){
+        requestAnimationFrame(reveal);
+      } else {
+        img.addEventListener('load', reveal, { once: true });
+        img.addEventListener('error', reveal, { once: true });
+      }
+      imgIO.unobserve(wrap);
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+  wraps.forEach(w => imgIO.observe(w));
+}
+
+/* ---------- 3. HERO — parallax + scale-on-scroll (profundidad) ---------- */
+function initHeroParallax(){
+  const heroSection = document.querySelector('.hero, .page-hero');
+  const heroVisual = document.querySelector('.hero-visual');
+  const heroImg = document.querySelector('.hero-photo-frame img, .hero-visual img');
+  if(!heroSection || reduceMotion) return;
+
+  let ticking = false;
+  function update(){
+    const rect = heroSection.getBoundingClientRect();
+    const progress = Math.min(Math.max(1 - (rect.bottom / (rect.height + window.innerHeight)), 0), 1);
+    if(heroVisual) heroVisual.style.transform = `scale(${1 + progress * 0.045})`;
+    if(heroImg) heroImg.style.transform = `translate3d(0, ${progress * -22}px, 0) scale(1.02)`;
+    ticking = false;
+  }
+  function onScroll(){
+    if(!ticking){ requestAnimationFrame(update); ticking = true; }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  update();
+}
+
+/* ---------- 4. CUSTOM CURSOR (solo desktop con mouse fino) ---------- */
+function initCustomCursor(){
+  if(!prefersFullMotion) return;
+  document.documentElement.classList.add('has-custom-cursor');
+
+  const cursor = document.createElement('div');
+  cursor.className = 'custom-cursor';
+  cursor.innerHTML = '<span class="cc-ring"></span><span class="cc-dot"></span>';
+  document.body.appendChild(cursor);
+
+  let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+  let rx = mx, ry = my;
+  let visible = false;
+
+  document.addEventListener('mousemove', (e) => {
+    mx = e.clientX; my = e.clientY;
+    if(!visible){ cursor.classList.add('cc-visible'); visible = true; }
+  }, { passive: true });
+  document.addEventListener('mouseleave', () => { cursor.classList.remove('cc-visible'); visible = false; });
+
+  function loop(){
+    rx += (mx - rx) * 0.2;
+    ry += (my - ry) * 0.2;
+    cursor.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
+    requestAnimationFrame(loop);
+  }
+  loop();
+
+  const interactiveSelector = 'a, button, .treat-card, .body-row, .cat, .testi, input, textarea';
+  document.addEventListener('mouseover', (e) => {
+    if(e.target.closest(interactiveSelector)) cursor.classList.add('cc-hover');
+  });
+  document.addEventListener('mouseout', (e) => {
+    const related = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest(interactiveSelector) : null;
+    if(e.target.closest(interactiveSelector) && !related){
+      cursor.classList.remove('cc-hover');
+    }
+  });
+  document.addEventListener('mousedown', () => cursor.classList.add('cc-active'));
+  document.addEventListener('mouseup', () => cursor.classList.remove('cc-active'));
+}
+
+/* ---------- 5. MAGNETIC BUTTONS ---------- */
+function initMagnetic(){
+  if(!prefersFullMotion) return;
+  document.querySelectorAll('.btn').forEach(el => {
+    el.addEventListener('mousemove', (e) => {
+      const r = el.getBoundingClientRect();
+      const x = e.clientX - r.left - r.width / 2;
+      const y = e.clientY - r.top - r.height / 2;
+      el.style.setProperty('--mag-x', (x * 0.22).toFixed(1) + 'px');
+      el.style.setProperty('--mag-y', (y * 0.32).toFixed(1) + 'px');
+    });
+    el.addEventListener('mouseleave', () => {
+      el.style.setProperty('--mag-x', '0px');
+      el.style.setProperty('--mag-y', '0px');
+    });
+  });
+}
+
+/* ---------- 6. CARD TILT + SPOTLIGHT ---------- */
+function initCardTilt(){
+  if(!prefersFullMotion) return;
+  document.querySelectorAll('.treat-card, .body-row, .cat, .testi').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;
+      const py = (e.clientY - r.top) / r.height;
+      card.style.setProperty('--tiltX', ((py - 0.5) * -3.5).toFixed(2) + 'deg');
+      card.style.setProperty('--tiltY', ((px - 0.5) * 3.5).toFixed(2) + 'deg');
+      card.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
+      card.style.setProperty('--my', (py * 100).toFixed(1) + '%');
+    });
+    card.addEventListener('mouseenter', () => card.style.setProperty('--lift', '-8px'));
+    card.addEventListener('mouseleave', () => {
+      card.style.setProperty('--tiltX', '0deg');
+      card.style.setProperty('--tiltY', '0deg');
+      card.style.setProperty('--lift', '0px');
+    });
+  });
+}
+
+/* ---------- 7. SPOTLIGHT en secciones oscuras (quote / contacto) ---------- */
+function initDarkSpotlight(){
+  if(!prefersFullMotion) return;
+  document.querySelectorAll('.quote-section, .contact-band').forEach(section => {
+    section.addEventListener('mousemove', (e) => {
+      const r = section.getBoundingClientRect();
+      section.style.setProperty('--sx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
+      section.style.setProperty('--sy', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
+    });
+  });
+}
+
+/* ============================================================
+   INICIALIZACIÓN
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  initTextMotion();
+  initImageMotion();
+  initHeroParallax();
+  initCustomCursor();
+  initMagnetic();
+  initCardTilt();
+  initDarkSpotlight();
+});
+
+/* ============================================================
+   FUNCIONALIDAD EXISTENTE DEL SITIO (sin cambios de comportamiento)
+   ============================================================ */
+
 // On touch devices, tapping a link navigates immediately with no time for the
 // hover-fill animation to show. Play it first, then open the link.
 document.querySelectorAll('a.btn[target="_blank"], .fab-item[target="_blank"]').forEach(link => {
@@ -68,17 +323,6 @@ if(burger && mobileMenu){
   }));
 }
 
-// Fade-in de fotos: quedan invisibles hasta que cargan, evitando el "salto" brusco
-// que se ve cuando una foto pesada termina de bajar en medio de la animación de la tarjeta.
-document.querySelectorAll('img[loading="lazy"]').forEach(img => {
-  if(img.complete && img.naturalWidth > 0){
-    img.classList.add('img-loaded');
-  } else {
-    img.addEventListener('load', () => img.classList.add('img-loaded'));
-    img.addEventListener('error', () => img.classList.add('img-loaded'));
-  }
-});
-
 // Sequential (non-random) stagger for grids where random order looks messy —
 // grouped by parent container so each grid's cards cascade 1, 2, 3, 4 in order.
 document.addEventListener('DOMContentLoaded', () => {
@@ -93,7 +337,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Apple-style load-in: fade + blur + scale, staggered, for above-the-fold content
+// Load-in: fade + translateY, staggered, for above-the-fold content
+// (los headings ya no pasan por aquí — los maneja initTextMotion)
 document.addEventListener('DOMContentLoaded', () => {
   const loadEls = document.querySelectorAll('.load-reveal');
   loadEls.forEach((el, i) => {
@@ -101,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Scroll reveal (same fade + blur + scale, triggered on entering viewport)
+// Scroll reveal (fade + translateY, triggered on entering viewport)
 // Elements with "reveal-rand" pop in at a random delay instead of all at once,
 // so grids (categories, treatments, cards) feel more lively — like a random cascade.
 const io = new IntersectionObserver((entries) => {
