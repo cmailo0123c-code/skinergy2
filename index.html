@@ -70,9 +70,32 @@
   .testi p{ font-size:15px; line-height:1.65; color:var(--ink); margin-bottom:20px; }
   .testi .who{ display:flex; align-items:center; gap:10px; font-size:13px; font-weight:700; color:var(--ink-soft); }
   .testi .who::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--coral); }
+
+  /* ---------- Glassmorphism (page-local cards) ---------- */
+  .hero-badge{ background:rgba(255,255,255,.6); backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%); border:1px solid rgba(255,255,255,.8); box-shadow:0 24px 40px -18px rgba(31,27,24,.25); }
+  .hero-badge p{ color:var(--ink-soft); }
+
+  .cat, .testi{
+    background:rgba(255,255,255,.6);
+    backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%);
+    border:1px solid rgba(255,255,255,.8);
+    will-change:transform;
+  }
+  .cat:hover, .testi:hover{
+    background:rgba(255,255,255,.8);
+    transform:translate3d(0,-8px,0) scale(1.01);
+    box-shadow:0 22px 40px -20px rgba(31,27,24,.28), 0 0 0 1px rgba(255,180,168,.4);
+    border-color:var(--coral-soft);
+  }
 </style>
 </head>
 <body>
+
+<div class="aurora" aria-hidden="true">
+  <span class="aurora-blob b1"></span>
+  <span class="aurora-blob b2"></span>
+  <span class="aurora-blob b3"></span>
+</div>
 
 <header id="siteHeader">
   <div class="wrap nav-row">
@@ -109,10 +132,10 @@
   <section class="hero">
     <div class="wrap hero-grid">
       <div>
-        <span class="eyebrow">Estudio de bienestar facial &amp; corporal — Las Condes</span>
-        <h1>Energía<br>para <em>tu piel</em></h1>
-        <p class="lead">Una experiencia boutique donde el autocuidado se vive como un ritual: del rostro al cuerpo, con resultados visibles y sin agredir tu piel — pensada para quienes quieran transformar su cuidado en un hábito consciente.</p>
-        <div class="hero-ctas">
+        <span class="load-reveal eyebrow">Estudio de bienestar facial &amp; corporal — Las Condes</span>
+        <h1 class="load-reveal">Energía<br>para <em>tu piel</em></h1>
+        <p class="load-reveal lead">Una experiencia boutique donde el autocuidado se vive como un ritual: del rostro al cuerpo, con resultados visibles y sin agredir tu piel — pensada para quienes quieran transformar su cuidado en un hábito consciente.</p>
+        <div class="load-reveal hero-ctas">
           <a class="btn" href="https://wa.me/56944476609?text=Hola%2C%20quiero%20agendar%20una%20sesi%C3%B3n%20en%20Skinergy" target="_blank" rel="noopener">
             Agendar por WhatsApp
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
@@ -130,7 +153,7 @@
         </div>
       </div>
 
-      <div class="hero-visual">
+      <div class="hero-visual load-reveal">
         <div class="hero-photo-frame">
           <img src="hero-gua-sha.jpg" alt="Tratamiento facial en Skinergy" loading="lazy">
           <svg class="breath-ring" viewBox="-160 -160 320 320" preserveAspectRatio="xMidYMid meet">
@@ -148,12 +171,12 @@
 
   <section id="lineas">
     <div class="wrap">
-      <div class="section-head">
+      <div class="section-head reveal">
         <span class="eyebrow">Nuestras dos líneas</span>
         <h2>Facial y Body, misma filosofía, distintas zonas.</h2>
       </div>
       <div class="lines">
-        <a class="line-card" href="facial.html" aria-label="Explorar Línea Facial">
+        <a class="line-card reveal reveal-rand" href="facial.html" aria-label="Explorar Línea Facial">
           <img src="cheeks-up.jpg" alt="Línea Facial Skinergy" loading="lazy">
           <span class="tag">Línea Facial</span>
           <div class="body">
@@ -164,7 +187,7 @@
             </span>
           </div>
         </a>
-        <a class="line-card" href="body.html" aria-label="Explorar Línea Body">
+        <a class="line-card reveal reveal-rand" href="body.html" aria-label="Explorar Línea Body">
           <img src="body-sculpt.jpg" alt="Línea Body Skinergy" loading="lazy">
           <span class="tag">Línea Body</span>
           <div class="body">
@@ -182,28 +205,28 @@
   <section class="quote-section">
     <div class="wrap quote-wrap">
       <span class="eyebrow">Filosofía Skinergy</span>
-      <blockquote>"En Skinergy creemos que la verdadera belleza se activa cuando cuerpo, mente y piel trabajan en armonía. Trabajamos desde la superficie y la musculatura, con técnicas manuales y procedimientos conscientes que siempre respetan tu piel — entrenando el rostro y el cuerpo con la misma lógica: constancia, técnica y presencia."</blockquote>
+      <blockquote class="reveal">"En Skinergy creemos que la verdadera belleza se activa cuando cuerpo, mente y piel trabajan en armonía. Trabajamos desde la superficie y la musculatura, con técnicas manuales y procedimientos conscientes que siempre respetan tu piel — entrenando el rostro y el cuerpo con la misma lógica: constancia, técnica y presencia."</blockquote>
       <p class="attribution">— Sofía, fundadora de Skinergy</p>
     </div>
   </section>
 
   <section>
     <div class="wrap">
-      <div class="section-head">
+      <div class="section-head reveal">
         <span class="eyebrow">Yoga Facial · 3 categorías</span>
         <h2>Yoga Facial: 3 maneras de trabajar tu rostro</h2>
       </div>
       <div class="categories">
-        <div class="cat"><span class="n">01</span><h4>Lifting &amp; Tonificación</h4><p>Reafirma y tonifica el rostro de manera integral, con efecto lifting visible desde las primeras sesiones.</p></div>
-        <div class="cat"><span class="n">02</span><h4>Zonas Específicas</h4><p>Trabajo concentrado en pómulos, mirada, mentón y cuello, según lo que quieras priorizar.</p></div>
-        <div class="cat"><span class="n">03</span><h4>Relajación &amp; Drenaje</h4><p>Libera tensión muscular acumulada, calma la piel y favorece el drenaje de líquidos.</p></div>
+        <div class="cat reveal reveal-seq"><span class="n">01</span><h4>Lifting &amp; Tonificación</h4><p>Reafirma y tonifica el rostro de manera integral, con efecto lifting visible desde las primeras sesiones.</p></div>
+        <div class="cat reveal reveal-seq"><span class="n">02</span><h4>Zonas Específicas</h4><p>Trabajo concentrado en pómulos, mirada, mentón y cuello, según lo que quieras priorizar.</p></div>
+        <div class="cat reveal reveal-seq"><span class="n">03</span><h4>Relajación &amp; Drenaje</h4><p>Libera tensión muscular acumulada, calma la piel y favorece el drenaje de líquidos.</p></div>
       </div>
     </div>
   </section>
 
-  <section style="background:var(--cream-warm);">
+  <section>
     <div class="wrap">
-      <div class="section-head">
+      <div class="section-head reveal">
         <span class="eyebrow">Lo que dicen en Google</span>
         <h2>Clientas que ya sintieron la energía</h2>
       </div>
@@ -216,10 +239,10 @@
   <section class="contact-band">
     <div class="wrap contact-grid">
       <div>
-        <span class="eyebrow on-dark">Visítanos</span>
-        <h2>Vitacura 2902, Las Condes</h2>
-        <p class="lead">Todas las reservas se gestionan por WhatsApp — cuéntanos qué buscas y te ayudamos a elegir el tratamiento ideal para ti.</p>
-        <div class="info-list">
+        <span class="reveal eyebrow on-dark">Visítanos</span>
+        <h2 class="reveal">Vitacura 2902, Las Condes</h2>
+        <p class="reveal lead">Todas las reservas se gestionan por WhatsApp — cuéntanos qué buscas y te ayudamos a elegir el tratamiento ideal para ti.</p>
+        <div class="info-list reveal">
           <div class="info-row">
             <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
             <span>Vitacura 2902, Las Condes, Santiago</span>
@@ -234,12 +257,12 @@
           <a href="mailto:Skinergy.studio1@gmail.com">Skinergy.studio1@gmail.com</a>
           </div>
         </div>
-        <a class="btn" href="https://wa.me/56944476609?text=Hola%2C%20quiero%20agendar%20una%20sesi%C3%B3n%20en%20Skinergy" target="_blank" rel="noopener">
+        <a class="btn reveal" href="https://wa.me/56944476609?text=Hola%2C%20quiero%20agendar%20una%20sesi%C3%B3n%20en%20Skinergy" target="_blank" rel="noopener">
           Agendar mi sesión
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
       </div>
-      <div class="map-frame">
+      <div class="map-frame reveal">
         <iframe src="https://www.google.com/maps?q=Skinergy+-+Energ%C3%ADa+para+tu+piel&ll=-33.4123653,-70.6027542&z=17&output=embed" width="100%" height="100%" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Estudio Skinergy — Av. Vitacura 2902, Las Condes"></iframe>
       </div>
     </div>
@@ -293,6 +316,5 @@
 </div>
 
 <script src="script.js"></script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"b25b561191c4422dade6b86a6d923d34","r":1}' crossorigin="anonymous"></script>
 </body>
 </html>
